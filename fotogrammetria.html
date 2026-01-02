@@ -133,14 +133,10 @@ Export shape:
 
 <!--
 <button id="exportCOLMAP">Export COLMAP (TXT)</button>
-<button id="stretchBtn">Stretch</button>
-<button id="saveWarp">Save stretch</button>
 -->
 </div><div class="viewer"> <div class="image-container" id="leftContainer"></div> 
 <div class="image-container" id="rightContainer"></div> 
-<!--
-<div class="image-container" id="warpContainer"> <canvas id="warpCanvas"></canvas> </div></div>
--->
+
 </div>
 
 
@@ -148,121 +144,6 @@ Export shape:
 
 const COLORS = ["red","yellow","green","cyan","blue","white","orange"];
 let colorIndex = 0;
-
-
-saveWarp.onclick = ()=>{
-    if(!warpView.baseImage){
-        alert("Nessuna immagine deformata");
-        return;
-    }
-const name =
-    imgLeftInput.files[0].name.replace(/\.[^/.]+$/,"") +
-    "_stretched.png";
-warpView.exportPNG(name);
-
-};
-
-
-
-class WarpView{
-    constructor(container, canvas){
-        this.container = container;
-        this.canvas = canvas;
-        this.ctx = canvas.getContext("2d");
-
-        this.zoom = 1;
-        this.pan = {x:0,y:0};
-        this.dragging = false;
-        this.start = {x:0,y:0};
-
-        this.imageCanvas = null;   // buffer immagine
-        this.markers = [];
-
-        container.onmousedown = e=>{
-            this.dragging = true;
-            this.start.x = e.clientX - this.pan.x;
-            this.start.y = e.clientY - this.pan.y;
-        };
-
-        container.onwheel = e=>{
-            e.preventDefault();
-
-            const factor = e.deltaY < 0 ? 1.1 : 0.9;
-            const oldZoom = this.zoom;
-            const rect = container.getBoundingClientRect();
-            const cx = rect.width/2;
-            const cy = rect.height/2;
-
-            const ix = (cx - this.pan.x) / oldZoom;
-            const iy = (cy - this.pan.y) / oldZoom;
-
-            this.zoom *= factor;
-            this.pan.x = cx - ix * this.zoom;
-            this.pan.y = cy - iy * this.zoom;
-
-            this.render();
-        };
-
-        document.addEventListener("mousemove",e=>{
-            if(!this.dragging) return;
-            this.pan.x = e.clientX - this.start.x;
-            this.pan.y = e.clientY - this.start.y;
-            this.render();
-        });
-
-        document.addEventListener("mouseup",()=>{
-            this.dragging = false;
-        });
-    }
-
-    setImage(imageData){
-        // buffer offscreen
-        this.imageCanvas = document.createElement("canvas");
-        this.imageCanvas.width  = imageData.width;
-        this.imageCanvas.height = imageData.height;
-        this.imageCanvas.getContext("2d").putImageData(imageData,0,0);
-
-        this.canvas.width  = imageData.width;
-        this.canvas.height = imageData.height;
-
-        // reset vista
-        this.zoom = 1;
-        this.pan = {
-            x:(this.container.clientWidth  - imageData.width )/2,
-            y:(this.container.clientHeight - imageData.height)/2
-        };
-
-        this.render();
-    }
-
-    render(){
-        if(!this.imageCanvas) return;
-
-        this.ctx.setTransform(1,0,0,1,0,0);
-        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
-
-        this.ctx.setTransform(
-            this.zoom,0,0,this.zoom,
-            this.pan.x,this.pan.y
-        );
-
-        // immagine
-        this.ctx.drawImage(this.imageCanvas,0,0);
-
-        // marker
-        for(const m of this.markers){
-            m.draw(this.ctx);
-        }
-    }
-
-    exportPNG(filename){
-        const a=document.createElement("a");
-        a.href=this.canvas.toDataURL("image/png");
-        a.download=filename;
-        a.click();
-    }
-}
-
 
 
 function drawPlus(ctx, x, y, size, color){
@@ -362,107 +243,6 @@ function applyHomography(H, x, y){
         y: (H[3]*x + H[4]*y + H[5]) / d
     };
 }
-
-
-stretchBtn.onclick = () => {
-
-    if (pairs.length < 4) {
-        alert("Servono almeno 4 marker");
-        return;
-    }
-
-    /* ================== OMOgrafia ================== */
-
-    // usa i primi 4 marker (minimo matematico)
-    const src = pairs.slice(0, 4).map(p => p.L);
-    const dst = pairs.slice(0, 4).map(p => p.R);
-
-    const H_lr = computeHomography(src, dst);          // L ? R
-    const H_rl = invertHomography([...H_lr, 1]);       // R ? L
-
-    if (!H_lr || !H_rl) {
-        alert("Omografia non valida");
-        return;
-    }
-
-    /* ================== CANVAS ================== */
-
-    const canvas = warpCanvas;
-    const ctx = canvas.getContext("2d");
-
-    // risoluzione REALE dell’immagine destra
-    canvas.width  = rightView.img.naturalWidth;
-    canvas.height = rightView.img.naturalHeight;
-
-    /* ================== IMMAGINE SORGENTE ================== */
-
-    const img = leftView.img;
-
-    const tmp = document.createElement("canvas");
-    tmp.width  = img.naturalWidth;
-    tmp.height = img.naturalHeight;
-
-    const tmpCtx = tmp.getContext("2d");
-    tmpCtx.drawImage(img, 0, 0);
-
-    const srcData = tmpCtx.getImageData(0, 0, tmp.width, tmp.height);
-    const out = ctx.createImageData(canvas.width, canvas.height);
-
-    /* ================== WARP PIXEL ================== */
-
-    for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-
-            const p = applyHomography(H_rl, x, y);
-            const sx = Math.round(p.x);
-            const sy = Math.round(p.y);
-
-            if (
-                sx >= 0 && sy >= 0 &&
-                sx < tmp.width &&
-                sy < tmp.height
-            ) {
-                const si = (sy * tmp.width + sx) * 4;
-                const di = (y * canvas.width + x) * 4;
-
-                out.data[di]     = srcData.data[si];
-                out.data[di + 1] = srcData.data[si + 1];
-                out.data[di + 2] = srcData.data[si + 2];
-                out.data[di + 3] = 255;
-            }
-        }
-    }
-
-    /* ================== CARICA NEL WARP VIEW ================== */
-
-    warpView.setImage(out);
-
-    /* ================== MARKER DI VERIFICA ================== */
-
-    warpView.markers = [];
-
-    // X oblique = marker L trasformati
-    for (const pair of pairs) {
-        const p = applyHomography(H_lr, pair.L.x, pair.L.y);
-
-        warpView.markers.push({
-            draw: ctx => drawX(ctx, p.x, p.y, 6, pair.color)
-        });
-    }
-
-    // + ortogonali = marker R originali
-    for (const pair of pairs) {
-        warpView.markers.push({
-            draw: ctx => drawPlus(ctx, pair.R.x, pair.R.y, 6, pair.color)
-        });
-    }
-
-    /* ================== RENDER FINALE ================== */
-
-    warpView.render();
-};
-
-
 
 
 /* =================== MODALITÀ =================== */
@@ -577,24 +357,12 @@ document.addEventListener("mousemove",e=>{
     });
 });
 
-document.addEventListener("mousemove", e=>{
-    if(!warpView.dragging) return;
-    warpView.pan.x = e.clientX - warpView.start.x;
-    warpView.pan.y = e.clientY - warpView.start.y;
-    warpView.render();
-});
-
-document.addEventListener("mouseup", ()=>{
-    warpView.dragging = false;
-    warpView.container.classList.remove("dragging");
-});
 
 
 
 /* =================== SETUP =================== */
 const leftView = new ImageView(leftContainer);
 const rightView = new ImageView(rightContainer);
-const warpView = new WarpView(warpContainer, warpCanvas);
 
 const views=[leftView,rightView];
 
