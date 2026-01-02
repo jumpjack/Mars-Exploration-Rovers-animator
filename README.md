@@ -17,11 +17,17 @@ If regardless of your prompt some moving rocks or dustdevils are added, it means
 
 ## Images repositories
 - Spirit:
-   - Pancam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2po_0xxx/
-   - Navcam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2no_0xxx/
-   - Hazard cam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2ho_0xxx/
+   - Pancam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2po_0xxx/browse/
+   - Navcam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2no_0xxx/browse/
+   - Hazard cam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2ho_0xxx/browse/
+   - [Search spirit images](https://pds-imaging.jpl.nasa.gov/beta/search?gather.common.spacecraft=spirit)
+   - [Official NASA "MER-A (Spirit) notebook" for exploring images and datasets](https://an.rsl.wustl.edu/mera/AN/an3.aspx?)
+   - [Archives index](https://pds-imaging.jpl.nasa.gov/volumes/mer.html)
 - Opportunity:
-   - Pancam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1po_0xxx/
-   - Navcam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1no_0xxx/
-   - Hazard cam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1ho_0xxx/
+   - Pancam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1po_0xxx/browse/
+   - Navcam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1no_0xxx/browse/
+   - Hazard cam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1ho_0xxx/browse/
+   - [Search opportunity images](https://pds-imaging.jpl.nasa.gov/beta/search?gather.common.spacecraft=opportunity)
+   - [Official NASA "MER-B (Opportunity) notebook" for exploring images and datasets](https://an.rsl.wustl.edu/merb/AN/an3.aspx?)
+   - [Archives index](https://pds-imaging.jpl.nasa.gov/volumes/mer.html)
 
