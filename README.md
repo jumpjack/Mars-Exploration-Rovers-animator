@@ -7,7 +7,7 @@ Spirit and Opportunity (MER-A and MER-B) were only able to take static images, n
 ## Web page
 The [web page](https://jumpjack.github.io/Mars-Exploration-Rovers-animator/fotogrammetria.html) allows loading two images, to be used as start and end frame of the video, and to manually mark them with some markers; a dozen of markers are usually enough to allow AI to match the two images and create a smooth transition. Press spave bar to toggle between pan/zoom and edit mode. Once you have placed enough markers, save the left and right images; you can also save/load the marker positions for further editing. Other buttons in the page are under test and experimental, so you can just ignore them at this moment. 
 
-Use [this page](https://jumpjack.github.io/Mars-Exploration-Rovers-animator/fotogrammetria.html) to look for images per sol, or [this official NASA page](https://an.rsl.wustl.edu/mera/AN/an3.aspx?) to analyze all mission products.
+Use [this page](https://jumpjack.github.io/Mars-Exploration-Rovers-animator/spirit-images-previewer.html) to look for images per sol, or [this official NASA page](https://an.rsl.wustl.edu/mera/AN/an3.aspx?) to analyze all mission products.
 
 ## Creating the video with  AI
 Go to https://app.pixverse.ai/create/transition ; upload the left and right images as start and end frame, then type one of these prompts, dependin on your specifi case:
@@ -18,18 +18,26 @@ Go to https://app.pixverse.ai/create/transition ; upload the left and right imag
 If regardless of your prompt some moving rocks or dustdevils are added, it means that in that location there are not enough markers, then AI can't identify details to create a transition, so it decides to use some fantasy...
 
 ## Images repositories
-- Spirit:
+- **Spirit**:
    - Pancam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2po_0xxx/browse/
    - Navcam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2no_0xxx/browse/
    - Hazard cam: https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2ho_0xxx/browse/
    - [Search spirit images](https://pds-imaging.jpl.nasa.gov/beta/search?gather.common.spacecraft=spirit)
    - [Official NASA "MER-A (Spirit) notebook" for exploring images and datasets](https://an.rsl.wustl.edu/mera/AN/an3.aspx?)
    - [Archives index](https://pds-imaging.jpl.nasa.gov/volumes/mer.html)
-- Opportunity:
+- **Opportunity**:
    - Pancam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1po_0xxx/browse/
    - Navcam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1no_0xxx/browse/
    - Hazard cam: https://planetarydata.jpl.nasa.gov/img/data/mer/opportunity/mer1ho_0xxx/browse/
    - [Search opportunity images](https://pds-imaging.jpl.nasa.gov/beta/search?gather.common.spacecraft=opportunity)
    - [Official NASA "MER-B (Opportunity) notebook" for exploring images and datasets](https://an.rsl.wustl.edu/merb/AN/an3.aspx?)
    - [Archives index](https://pds-imaging.jpl.nasa.gov/volumes/mer.html)
+ 
+## Demo video
+https://www.youtube.com/watch?v=TcznC3bLTbM
+
+## Source images
+- Original images taken from https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2no_0xxx/browse/ ; preview images here: https://jumpjack.github.io/Mars-Exploration-Rovers-animator/spirit-images-previewer.html
+- Images used as start/end frames, already marked: [folder](https://github.com/jumpjack/Mars-Exploration-Rovers-animator/tree/main/images/marked)
+
 
