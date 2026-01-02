@@ -5,7 +5,9 @@
 Spirit and Opportunity (MER-A and MER-B) were only able to take static images, no videos; the procedure and the web page in this repository allows  you to create smooth video transitions from static images by using stereophotogrammetry and Artificial Intelligence
 
 ## Web page
-THe web pages allows loading two images, to be used as start and end frame of the video, and to manually mark them with some markers; a dozen of markers are usually enough to allow AI to match the two images and create a smooth transition. Press spave bar to toggle between pan/zoom and edit mode. Once you have placed enough markers, save the left and right images; you can also save/load the marker positions for further editing. Other buttons in the page are under test and experimental, so you can just ignore them at this moment.
+The [web page](https://jumpjack.github.io/Mars-Exploration-Rovers-animator/fotogrammetria.html) allows loading two images, to be used as start and end frame of the video, and to manually mark them with some markers; a dozen of markers are usually enough to allow AI to match the two images and create a smooth transition. Press spave bar to toggle between pan/zoom and edit mode. Once you have placed enough markers, save the left and right images; you can also save/load the marker positions for further editing. Other buttons in the page are under test and experimental, so you can just ignore them at this moment. 
+
+Use [this page](https://jumpjack.github.io/Mars-Exploration-Rovers-animator/fotogrammetria.html) to look for images per sol, or [this official NASA page](https://an.rsl.wustl.edu/mera/AN/an3.aspx?) to analyze all mission products.
 
 ## Creating the video with  AI
 Go to https://app.pixverse.ai/create/transition ; upload the left and right images as start and end frame, then type one of these prompts, dependin on your specifi case:
