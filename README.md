@@ -1,4 +1,4 @@
-<img width="1246" height="607" alt="image" src="https://github.com/user-attachments/assets/aac39aa1-9563-4435-8cec-893fdb61d45d" />
+<img width="1396" height="673" alt="image" src="https://github.com/user-attachments/assets/2c55b104-e4a3-44f4-bb92-1be7bd54133d" />
 
 
 # Mars-Exploration-Rovers-animator
