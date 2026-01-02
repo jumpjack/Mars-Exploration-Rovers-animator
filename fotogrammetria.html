@@ -105,24 +105,12 @@ img{
 Left <input type="file" id="imgLeftInput"> 
 Right <input type="file" id="imgRightInput">
 
-<!--
-Color
-<select id="colorSelect">
-    <option value="red">Red</option>
-    <option value="yellow">Yellow</option>
-    <option value="green">Green</option>
-    <option value="cyan">Cyan</option>
-    <option value="blue">Blue</option>
-    <option value="white">White</option>
-    <option value="orange">Orange</option>
-</select>
-
 Export shape:
 <select id="exportShape">
 <option value="cross">Cross</option>
 <option value="dot">Dot</option>
 </select>
--->
+
 <span class="counter">Markers: <span id="markerCount">0</span></span>
 
 <br><br>
@@ -131,9 +119,7 @@ Export shape:
 <button id="exportLeft">Save left image</button>
 <button id="exportRight">Save right image</button>
 
-<!--
-<button id="exportCOLMAP">Export COLMAP (TXT)</button>
--->
+
 </div><div class="viewer"> <div class="image-container" id="leftContainer"></div> 
 <div class="image-container" id="rightContainer"></div> 
 
@@ -576,86 +562,6 @@ imgLeftInput.onchange=e=>leftView.attachImage(e.target.files[0]);
 imgRightInput.onchange=e=>rightView.attachImage(e.target.files[0]);
 
 
-function exportCOLMAPFun(){
-    if(!leftView.img || !rightView.img || pairs.length === 0){
-        alert("Servono due immagini caricate e almeno un marker");
-        return;
-    }
-
-    /* ========= CAMERAS.TXT ========= */
-    const cams = [];
-
-    // Camera per immagine sinistra
-    const wL = leftView.img.naturalWidth;
-    const hL = leftView.img.naturalHeight;
-    const fL = Math.max(wL, hL);
-    cams.push(`1 PINHOLE ${wL} ${hL} ${fL} ${fL} ${wL/2} ${hL/2}`);
-
-    // Camera per immagine destra
-    const wR = rightView.img.naturalWidth;
-    const hR = rightView.img.naturalHeight;
-    const fR = Math.max(wR, hR);
-    cams.push(`2 PINHOLE ${wR} ${hR} ${fR} ${fR} ${wR/2} ${hR/2}`);
-
-    /* ========= IMAGES.TXT ========= */
-    let imagesTxt = "";
-
-    // immagine sinistra
-    imagesTxt += `1 1 0 0 0 0 0 0 1 ${imgLeftInput.files[0].name}\n`;
-    pairs.forEach((p, idx) => {
-        imagesTxt += `${p.L.x.toFixed(3)} ${p.L.y.toFixed(3)} ${idx+1} `;
-    });
-    imagesTxt += "\n\n";
-
-    // immagine destra
-    imagesTxt += `2 2 0 0 0 0 0 0 1 ${imgRightInput.files[0].name}\n`;
-    pairs.forEach((p, idx) => {
-        imagesTxt += `${p.R.x.toFixed(3)} ${p.R.y.toFixed(3)} ${idx+1} `;
-    });
-    imagesTxt += "\n";
-
-    /* ========= POINTS3D.TXT ========= */
-    let points3DTxt = "";
-    const cxL = wL / 2, cyL = hL / 2;
-    const cxR = wR / 2, cyR = hR / 2;
-    const fL_val = fL, fR_val = fR;
-
-    // supponiamo baseline 1 unità
-    const baseline = 1;
-
-    pairs.forEach((p, idx) => {
-        const xl = p.L.x - cxL;
-        const yl = p.L.y - cyL;
-        const xr = p.R.x - cxR;
-        const yr = p.R.y - cyR;
-        const disparity = xl - xr || 0.0001;
-
-        const Z = fL_val * baseline / disparity;
-        const X = xl * Z / fL_val;
-        const Y = yl * Z / fL_val;
-
-        const R = 255, G = 0, B = 0;
-        const ERROR = 0;
-        const TRACK = `1,${idx} 2,${idx}`;
-        points3DTxt += `${idx+1} ${X.toFixed(6)} ${Y.toFixed(6)} ${Z.toFixed(6)} ${R} ${G} ${B} ${ERROR} ${TRACK}\n`;
-    });
-
-    /* ========= DOWNLOAD ========= */
-    function download(text, name){
-        const b = new Blob([text], {type:"text/plain"});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(b);
-        a.download = name;
-        a.click();
-    }
-
-    download(cams.join("\n"), "cameras.txt");
-    download(imagesTxt, "images.txt");
-    download(points3DTxt, "points3D.txt");
-}
-
-
-exportCOLMAP.onclick = exportCOLMAPFun;
 
 
 </script>
