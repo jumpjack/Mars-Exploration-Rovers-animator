@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Mars Rover Spirit – Indexed IMG Viewer</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0e1220;
+    color: #fff;
+    padding: 20px;
+}
+h1 {
+    text-align: center;
+    color: #e94560;
+}
+.controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.controls select, .controls button {
+    padding: 8px;
+    margin: 5px;
+}
+.status {
+    text-align: center;
+    margin: 10px;
+    color: #ffd700;
+}
+.sol-block {
+    margin-top: 30px;
+}
+.sol-title {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+.card {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    width: 220px;
+}
+.card img {
+    max-width: 200px;
+    border-radius: 4px;
+}
+.name {
+    font-size: 11px;
+    word-break: break-all;
+    margin-top: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚀 Mars Rover Spirit – Verified IMG Archive</h1>
+
+<div class="controls">
+    Camera:
+    <select id="cameraSelect">
+        <option value="navcam">Navcam</option>
+        <option value="pancam">Pancam</option>
+        <option value="hazcam">Hazcam</option>
+    </select>
+
+    Sol:
+    <select id="solSelect"></select>
+
+    <button id="loadBtn">Load images</button>
+    <button id="loadLocalBtn">Load local cache</button>
+    <button id="clearBtn">Clear cache</button>
+</div>
+
+<div class="status" id="status"></div>
+<div id="main"></div>
+
+<!-- INDICE FILE -->
+<script src="IMGfiles.js"></script>
+
+<script>
+/* ================= CONFIG ================= */
+
+const PROXY = "https://win98.altervista.org/space/exploration/myp.php?pass=miapass&mode=native&url=";
+
+const BASE_PATHS = {
+    pancam: "https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2po_0xxx/browse/",
+    navcam: "https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2no_0xxx/browse/",
+    hazcam: "https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2ho_0xxx/browse/"
+};
+
+
+
+
+/* ================= STATE ================= */
+
+let db;
+const availableSolsByCamera = {};
+
+/* ================= DB ================= */
+
+function openDB() {
+    return new Promise(resolve => {
+        const req = indexedDB.open("mars-img-cache", 1);
+        req.onupgradeneeded = e => {
+            e.target.result.createObjectStore("images");
+        };
+        req.onsuccess = e => {
+            db = e.target.result;
+            resolve();
+        };
+    });
+}
+
+function saveImage(key, blob, imageUrl) {
+    db.transaction("images", "readwrite")
+      .objectStore("images")
+      .put({ blob, imageUrl }, key);
+}
+
+function loadImage(key) {
+    return new Promise(resolve => {
+        const req = db.transaction("images", "readonly")
+            .objectStore("images").get(key);
+        req.onsuccess = () => resolve(req.result || null);
+    });
+}
+
+
+
+function imageExists(key) {
+    return new Promise(resolve => {
+        const req = db.transaction("images", "readonly")
+            .objectStore("images").getKey(key);
+        req.onsuccess = () => resolve(!!req.result);
+    });
+}
+
+function clearCache() {
+    db.transaction("images", "readwrite").objectStore("images").clear();
+    document.getElementById("main").innerHTML = "";
+    setStatus("Cache cancellata");
+}
+
+/* ================= UTIL ================= */
+
+function setStatus(msg) {
+    document.getElementById("status").textContent = msg;
+}
+
+function passesFilter(name) {
+    const n = name.toLowerCase();
+    return n.includes("ffl") && ( n.includes("l0m1") || n.includes("l2m1") );
+}
+
+/* ================= INIT INDEX ================= */
+
+function buildAvailableSols() {
+    for (const cam in filesAvailabilityIMG) {
+        availableSolsByCamera[cam] = [];
+
+        for (const solKey in filesAvailabilityIMG[cam]) {
+            const solNum = parseInt(solKey.replace("sol", ""), 10);
+            if (hasFilteredImages(cam, solKey)) {
+                availableSolsByCamera[cam].push(solNum);
+            }
+        }
+        availableSolsByCamera[cam].sort((a,b)=>a-b);
+    }
+}
+
+
+function hasFilteredImages(cam, solKey) {
+    const solData = filesAvailabilityIMG[cam][solKey];
+    for (const firstLevel in solData) {
+        const secondLevelObj = solData[firstLevel];
+        for (const secondLevel in secondLevelObj) {
+            const filesArray = secondLevelObj[secondLevel];
+            for (const name of filesArray) {
+                if (passesFilter(name)) return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+/* ================= UI ================= */
+
+function updateSolSelect(cam) {
+    const sel = document.getElementById("solSelect");
+    sel.innerHTML = "";
+    for (const sol of availableSolsByCamera[cam] || []) {
+        const o = document.createElement("option");
+        o.value = sol;
+        o.textContent = sol;
+        sel.appendChild(o);
+    }
+}
+
+function getSolBlock(sol, cam) {
+    const id = `sol_${sol}_${cam}`;
+    let block = document.getElementById(id);
+
+    if (!block) {
+        block = document.createElement("div");
+        block.id = id;
+        block.className = "sol-block";
+
+        const title = document.createElement("div");
+        title.className = "sol-title";
+        title.textContent = `Sol ${sol} – ${cam.toUpperCase()}`;
+
+        const grid = document.createElement("div");
+        grid.className = "grid";
+
+        block.appendChild(title);
+        block.appendChild(grid);
+        document.getElementById("main").appendChild(block);
+    }
+    return block.querySelector(".grid");
+}
+
+
+function addCard(container, name, blob, imageUrl) {
+    // Evita duplicati
+    if ([...container.querySelectorAll(".name")].some(e => e.textContent === name)) return;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(blob);
+
+    const nameLabel = document.createElement("div");
+    nameLabel.className = "name";
+
+    const link = document.createElement("a");
+    link.href = imageUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = name;
+    link.style.color = "#1e90ff";
+    link.style.textDecoration = "none";
+
+    nameLabel.appendChild(link);
+
+    card.appendChild(img);
+    card.appendChild(nameLabel);
+    container.appendChild(card);
+}
+
+/* ================= CORE ================= */
+
+async function downloadAndValidate(url) {
+url = url.toLowerCase();
+console.log(url);
+    const res = await fetch(PROXY + encodeURIComponent(url));
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    if (!blob.size) return null;
+
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(blob);
+        img.onerror = () => resolve(null);
+        img.src = URL.createObjectURL(blob);
+    });
+}
+
+
+
+async function loadRemote() {
+    const cam = cameraSelect.value;
+    const sol = solSelect.value;
+    const solKey = "sol" + sol;
+    const solData = filesAvailabilityIMG[cam][solKey];
+    const grid = getSolBlock(sol, cam);
+
+    let count = 0;
+
+    for (const a in solData)
+        for (const b in solData[a])
+            for (const base of solData[a][b]) {
+
+                if (!passesFilter(base)) continue;
+
+                const name = base + ".img.jpg";
+                const key = `${sol}_${cam}_${name}`;
+                // Costruisci SEMPRE l'URL originale
+                const imageUrl = `${BASE_PATHS[cam]}sol${sol}/rdr/${name}`;
+
+                if (await imageExists(key)) {
+                    const blob = await loadImage(key);
+                    if (blob) {
+                        addCard(grid, name, blob, imageUrl.toLowerCase());
+                    }
+                    continue;
+                }
+
+                setStatus("Downloading " + name);
+                const blob = await downloadAndValidate(imageUrl);
+                if (!blob) {
+                    console.warn("Scartata (non valida):", name);
+                    continue;
+                }
+
+                setStatus("Scaricata " + name);
+saveImage(key, blob, imageUrl.toLowerCase());
+addCard(grid, name, blob, imageUrl.toLowerCase());
+
+                count++;
+            }
+
+    setStatus(`Sol ${sol}: ${count} nuove immagini`);
+}
+
+
+
+async function loadLocal() {
+    document.getElementById("main").innerHTML = "";
+    const tx = db.transaction("images", "readonly");
+    const store = tx.objectStore("images");
+    const req = store.openCursor();
+
+    req.onsuccess = e => {
+        const cur = e.target.result;
+        if (!cur) return;
+
+        const [sol, cam, ...rest] = cur.key.split("_");
+        const name = rest.join("_");
+        const grid = getSolBlock(sol, cam);
+
+        addCard(
+            grid,
+            name,
+            cur.value.blob,
+            cur.value.imageUrl
+        );
+
+        cur.continue();
+    };
+
+    setStatus("Cache locale caricata");
+}
+
+/* ================= START ================= */
+
+cameraSelect.onchange = () => updateSolSelect(cameraSelect.value);
+loadBtn.onclick = loadRemote;
+loadLocalBtn.onclick = loadLocal;
+clearBtn.onclick = clearCache;
+
+(async () => {
+    await openDB();
+    buildAvailableSols();
+    updateSolSelect(cameraSelect.value);
+    setStatus("Pronto");
+})();
+</script>
+
+</body>
+</html>
