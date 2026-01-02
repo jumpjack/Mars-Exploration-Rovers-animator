@@ -33,6 +33,7 @@ img{
 }
 
 
+
 .marker{
     position:absolute;
     transform:translate(-50%,-50%);
@@ -99,50 +100,46 @@ img{
 
 <body>
 
-<div id="modeBar">MODALITÀ EDITING MARKER</div>
+<div id="modeBar">MARKER EDITING MODE</div>
+<div class="controls"> 
+Left <input type="file" id="imgLeftInput"> 
+Right <input type="file" id="imgRightInput">
 
-<div class="controls">
-    Sinistra <input type="file" id="imgLeftInput">
-    Destra <input type="file" id="imgRightInput">
-
-    Colore
-    <select id="colorSelect">
-        <option value="red">Rosso</option>
-        <option value="yellow">Giallo</option>
-        <option value="green">Verde</option>
-        <option value="cyan">Celeste</option>
-        <option value="blue">Blu</option>
-        <option value="white">Bianco</option>
-        <option value="orange">Arancione</option>
-    </select>
-
-Forma export:
-<select id="exportShape">
-    <option value="cross">Croce</option>
-    <option value="dot">Pallino</option>
+Color
+<select id="colorSelect">
+    <option value="red">Red</option>
+    <option value="yellow">Yellow</option>
+    <option value="green">Green</option>
+    <option value="cyan">Cyan</option>
+    <option value="blue">Blue</option>
+    <option value="white">White</option>
+    <option value="orange">Orange</option>
 </select>
 
-    <span class="counter">Marker: <span id="markerCount">0</span></span>
+Export shape:
+<select id="exportShape">
+<option value="cross">Cross</option>
+<option value="dot">Dot</option>
+</select>
 
-    <br><br>
-    <button id="saveJSON">Salva JSON</button>
-    <input type="file" id="loadJSON" accept="application/json">
-    <button id="exportLeft">Salva immagine sinistra</button>
-    <button id="exportRight">Salva immagine destra</button>
-<button id="exportCOLMAP">Esporta COLMAP (TXT)</button>
+<span class="counter">Markers: <span id="markerCount">0</span></span>
+
+<br><br>
+<button id="saveJSON">Save JSON</button>
+<input type="file" id="loadJSON" accept="application/json">
+<button id="exportLeft">Save left image</button>
+<button id="exportRight">Save right image</button>
+
+<!--
+<button id="exportCOLMAP">Export COLMAP (TXT)</button>
 <button id="stretchBtn">Stretch</button>
-<button id="saveWarp">Salva stretch</button>
-
-    
-</div>
-
-<div class="viewer">
-    <div class="image-container" id="leftContainer"></div>
-    <div class="image-container" id="rightContainer"></div>
-<div class="image-container" id="warpContainer">
-    <canvas id="warpCanvas"></canvas>
-</div>
-
+<button id="saveWarp">Save stretch</button>
+-->
+</div><div class="viewer"> <div class="image-container" id="leftContainer"></div> 
+<div class="image-container" id="rightContainer"></div> 
+<!--
+<div class="image-container" id="warpContainer"> <canvas id="warpCanvas"></canvas> </div></div>
+-->
 </div>
 
 
@@ -392,7 +389,7 @@ stretchBtn.onclick = () => {
     const canvas = warpCanvas;
     const ctx = canvas.getContext("2d");
 
-    // risoluzione REALE dell’immagine destra
+    // risoluzione REALE dellâ€™immagine destra
     canvas.width  = rightView.img.naturalWidth;
     canvas.height = rightView.img.naturalHeight;
 
@@ -467,7 +464,7 @@ stretchBtn.onclick = () => {
 
 
 
-/* =================== MODALITÀ =================== */
+/* =================== MODALITÃ€ =================== */
 let MODE="EDIT";
 document.addEventListener("keydown",e=>{
     if(e.code==="Space"){
@@ -854,7 +851,7 @@ function exportCOLMAPFun(){
     const cxR = wR / 2, cyR = hR / 2;
     const fL_val = fL, fR_val = fR;
 
-    // supponiamo baseline 1 unità
+    // supponiamo baseline 1 unitÃ 
     const baseline = 1;
 
     pairs.forEach((p, idx) => {
