@@ -34,7 +34,7 @@ If regardless of your prompt some moving rocks or dustdevils are added, it means
    - [Archives index](https://pds-imaging.jpl.nasa.gov/volumes/mer.html)
  
 ## Demo video
-https://www.youtube.com/watch?v=TcznC3bLTbM
+https://www.youtube.com/watch?v=r70BrJq81cA
 [![](https://markdown-videos-api.jorgenkh.no/youtube/{r70BrJq81cA})](https://youtu.be/{r70BrJq81cA}) 
 
 ## Source images
