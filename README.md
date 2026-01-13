@@ -35,7 +35,7 @@ If regardless of your prompt some moving rocks or dustdevils are added, it means
  
 ## Demo video
 https://www.youtube.com/watch?v=TcznC3bLTbM
-[![](https://markdown-videos-api.jorgenkh.no/youtube/{TcznC3bLTbM})](https://youtu.be/{r70BrJq81cA}) 
+[![](https://markdown-videos-api.jorgenkh.no/youtube/{r70BrJq81cA})](https://youtu.be/{r70BrJq81cA}) 
 
 ## Source images
 - Original images taken from https://planetarydata.jpl.nasa.gov/img/data/mer/spirit/mer2no_0xxx/browse/ ; preview images here: https://jumpjack.github.io/Mars-Exploration-Rovers-animator/spirit-images-previewer.html
